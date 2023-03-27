@@ -6,18 +6,34 @@ import './Shop.css';
 
 const Shop = () => {
     const [Products, setProducts] = useState([]);
-    const [cart, setCart] =useState([])
+    const [cart, setCart] = useState([])
 
-    useEffect( ()=>{
+    useEffect(() => {
         fetch('https://raw.githubusercontent.com/ProgrammingHero1/ema-john-resources/main/fakeData/products.json')
-        .then(res => res.json())
-        .then(data => setProducts(data));
+            .then(res => res.json())
+            .then(data => setProducts(data));
     }, []);
 
-    useEffect( ()=>{
+    useEffect(() => {
         const storedCart = getShoppingCart();
-        console.log(storedCart);
-    } , [])
+        const savedCart = [];
+        // step 1: get id
+        for (const id in storedCart) {
+            // step 2 get the product by using id
+            const addedProduct = Products.find(product => product.id === id);
+
+            if (addedProduct) {
+                // step 3: get quantity of the product
+                const quantity = storedCart[id];
+                addedProduct.quantity = quantity;
+                // step 4: add the added product to the saved cart
+                savedCart.push(addedProduct);
+            }
+            // console.log('added Product', addedProduct)
+        }
+        // step 5: set the cart
+        setCart(savedCart);
+    }, [Products])
 
     const handleAddToCart = (product) => {
         // console.log(product)
@@ -31,14 +47,14 @@ const Shop = () => {
             <div className='products-countainer'>
                 {
                     Products.map(product => <Product
-                      key={product.id}
-                      product={product}
-                      handleAddToCart={handleAddToCart}
+                        key={product.id}
+                        product={product}
+                        handleAddToCart={handleAddToCart}
                     ></Product>)
                 }
             </div>
             <div className='cart-container'>
-               <Cart cart={cart}></Cart>
+                <Cart cart={cart}></Cart>
             </div>
         </div>
     );
